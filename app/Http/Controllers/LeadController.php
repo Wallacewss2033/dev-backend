@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LeadRequest;
+use App\Repositories\LeadRepository;
 use App\Services\LeadService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -16,19 +18,25 @@ class LeadController extends Controller
         $this->leadService = $leadService;
     }
 
-    public function story(Request $request)
+    public function story(LeadRequest $request)
     {
         try {
-            $this->leadService->setLead($request->all());
+
+            $data = $request->all();
+            $data['cpf'] = LeadRepository::formatCPF($request->cpf);
+
+            $this->leadService->setLead($data);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Cadastrado com sucesso!'
             ], Response::HTTP_CREATED);
+
         } catch (Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
-            ], $e->getCode() ?? Response::HTTP_BAD_REQUEST);
+            ], Response::HTTP_BAD_REQUEST);
         }
     }
 }

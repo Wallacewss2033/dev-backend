@@ -11,4 +11,8 @@ class LeadRepository implements LeadInterface {
     {
         return Lead::create($data);    
     }
+
+    public static function formatCPF($cpf) {
+        return preg_replace('/[^0-9]/', '', $cpf);
+    }
 }
