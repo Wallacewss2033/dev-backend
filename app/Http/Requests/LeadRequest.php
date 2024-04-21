@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Services\EmailableService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LeadRequest extends FormRequest
@@ -27,7 +28,7 @@ class LeadRequest extends FormRequest
                     $fail('O campo nome deve conter pelo menos dois nomes separados por um espaço.');
                 }
             }],
-            'cpf' => ['required', 'string', 'max:14', 'unique:leads,cpf', function ($attribute, $value, $fail) {
+            'cpf' => ['required', 'string', 'max:14', function ($attribute, $value, $fail) {
                 $cpf = preg_replace('/[^0-9]/', '', $value);
                 if (strlen($cpf) != 11 ||
                     $cpf == '00000000000' ||
@@ -69,7 +70,11 @@ class LeadRequest extends FormRequest
                 }
             }],
             'phone' => ['nullable', 'string', 'size:11', 'regex:/^([1-9]{2})(9[1-9])[0-9]{7}$/'],
-            'email' => ['required', 'email', 'unique:leads,email', 'max:100'],
+            'email' => ['required', 'email', 'max:100', function($attribute, $value, $fail) {
+                if(!EmailableService::verify($value)) {
+                    $fail('Este email tem o score abaixo do esperado');
+                }
+            }],
         ];
     }
 }

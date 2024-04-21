@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LeadRequest;
 use App\Repositories\LeadRepository;
+use App\Services\EmailableService;
 use App\Services\LeadService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -22,6 +23,8 @@ class LeadController extends Controller
     {
         try {
 
+            EmailableService::verify($request->email);
+            
             $data = $request->all();
             $data['cpf'] = LeadRepository::formatCPF($request->cpf);
 
